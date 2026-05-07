@@ -1,0 +1,35 @@
+# Don't commit the 1.3 GB of manuals — they live locally only
+*.pdf
+*.doc
+*.docx
+
+# Subfolders containing manuals/binaries
+C 1-2/
+CALPORT 300/
+CALSOFT/
+CALSOURCE 100/
+CALSOURCE 200/
+CAMCAL for WINDOWS/
+Current clamps for MTEs portables/
+HHT 42/
+HYDROCAL 1002/
+Insulation test bench/
+K2006/
+MTE Product Line Voltage Regulators/
+NSQ 100/
+NSQ 200/
+NSQ 400/
+NSQ Soft/
+PRS 1.3/
+PSM 2.1/
+PSP 10/
+PTS 2.1/
+PTS 2.1 Version 4/
+PTS 400.3/
+PWS 2.3 Version 2/
+mte handbooks 2006/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
