@@ -122,6 +122,7 @@ public sealed class MainViewModel : ObservableObject
             {
                 Raise(nameof(ConnectionLabel));
                 Raise(nameof(ConnectionStateColor));
+                Raise(nameof(HeaderModelLine));
                 ConnectCommand.RaiseCanExecuteChanged();
                 DisconnectCommand.RaiseCanExecuteChanged();
                 ApplyCommand.RaiseCanExecuteChanged();
@@ -141,7 +142,28 @@ public sealed class MainViewModel : ObservableObject
     public string ConnectionStateColor => IsConnected ? "#43A047" : "#888888";
 
     private string _versionLine = "—";
-    public string VersionLine { get => _versionLine; set => Set(ref _versionLine, value); }
+    public string VersionLine { get => _versionLine; set { if (Set(ref _versionLine, value)) Raise(nameof(HeaderModelLine)); } }
+
+    /// <summary>Header model line — shows connected unit identity or a friendly placeholder.</summary>
+    public string HeaderModelLine
+    {
+        get
+        {
+            if (!IsConnected || _versionLine == "—") return "PPS 400.3 — (not connected)";
+            // VersionLine looks like "PPS400.3 #28492 | 3.07 | OPRW | 11.10.2005"
+            return _versionLine.Replace(" | ", "  ·  ");
+        }
+    }
+
+    private bool _sideBarCollapsed;
+    public bool SideBarCollapsed
+    {
+        get => _sideBarCollapsed;
+        set { if (Set(ref _sideBarCollapsed, value)) { Raise(nameof(SideBarWidth)); Raise(nameof(SideBarToggleGlyph)); } }
+    }
+    public double SideBarWidth        => _sideBarCollapsed ? 24 : 80;
+    public string SideBarToggleGlyph  => _sideBarCollapsed ? "▶" : "◀";
+    public RelayCommand ToggleSideBarCommand => new(() => SideBarCollapsed = !_sideBarCollapsed);
 
     private string _autoDetectStatus = "Idle";
     public string AutoDetectStatus { get => _autoDetectStatus; set => Set(ref _autoDetectStatus, value); }
