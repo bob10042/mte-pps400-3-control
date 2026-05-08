@@ -38,11 +38,14 @@ public sealed class ParameterSetterViewModel : ObservableObject
 {
     private readonly Func<PpsClient?> _getClient;
     private readonly Func<bool> _isConnected;
+    private readonly Action<string,string,string>? _opLogger;
 
-    public ParameterSetterViewModel(Func<PpsClient?> getClient, Func<bool> isConnected)
+    public ParameterSetterViewModel(Func<PpsClient?> getClient, Func<bool> isConnected,
+                                    Action<string,string,string>? opLogger = null)
     {
         _getClient = getClient;
         _isConnected = isConnected;
+        _opLogger = opLogger;
 
         Categories = new ObservableCollection<string>(ParameterCatalog.Categories);
         Parameters = new ObservableCollection<ParameterDefinition>();
@@ -186,10 +189,12 @@ public sealed class ParameterSetterViewModel : ObservableObject
                                                            : "ok";
                 Log.Insert(0, new CommandLogEntry { Sent = line, Received = received, Status = status });
                 while (Log.Count > 100) Log.RemoveAt(Log.Count - 1);
+                _opLogger?.Invoke(line, received, status);
             }
             catch (Exception ex)
             {
                 Log.Insert(0, new CommandLogEntry { Sent = line, Received = $"<exception> {ex.Message}", Status = "ERR" });
+                _opLogger?.Invoke(line, ex.Message, "ERR");
             }
         }
     }

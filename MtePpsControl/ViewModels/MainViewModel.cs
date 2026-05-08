@@ -49,7 +49,9 @@ public sealed class MainViewModel : ObservableObject
         Ripple    = new RippleViewModel   (() => _client, () => IsConnected);
         Sequence  = new SequenceViewModel (() => _client, () => IsConnected, this);
         Database  = new DatabaseViewModel (this);
-        Setter    = new ParameterSetterViewModel(() => _client, () => IsConnected);
+        OpLog     = new OperationalLog();
+        Setter    = new ParameterSetterViewModel(() => _client, () => IsConnected,
+                                                 (s, r, st) => OpLog.LogCommand(s, r, st, "Setter"));
         Csv       = new CsvLogger();
         ToggleCsvLogCommand = new RelayCommand(ToggleCsv);
 
@@ -74,6 +76,7 @@ public sealed class MainViewModel : ObservableObject
     public DatabaseViewModel        Database { get; }
     public ParameterSetterViewModel Setter { get; }
     public CsvLogger                Csv { get; }
+    public OperationalLog           OpLog { get; }
     public RelayCommand             ToggleCsvLogCommand { get; }
     public bool   IsCsvLogging => Csv.IsLogging;
     public string CsvLogStatus => Csv.IsLogging
@@ -401,16 +404,19 @@ public sealed class MainViewModel : ObservableObject
                     IsBusy = busy;
 
                     // Write a CSV row if logging is on. Snapshot current per-phase state.
+                    var thdUs = Phases.Select(p => p.ThdU).ToArray();
+                    var thdIs = Phases.Select(p => p.ThdI).ToArray();
+                    var phiUs = Phases.Select(p => p.PhiU).ToArray();
+                    var phiIs = Phases.Select(p => p.PhiI).ToArray();
+                    var statUs= Phases.Select(p => p.StatusU).ToArray();
+                    var statIs= Phases.Select(p => p.StatusI).ToArray();
+
                     if (Csv.IsLogging)
-                    {
-                        var thdUs = Phases.Select(p => p.ThdU).ToArray();
-                        var thdIs = Phases.Select(p => p.ThdI).ToArray();
-                        var phiUs = Phases.Select(p => p.PhiU).ToArray();
-                        var phiIs = Phases.Select(p => p.PhiI).ToArray();
-                        var statUs= Phases.Select(p => p.StatusU).ToArray();
-                        var statIs= Phases.Select(p => p.StatusI).ToArray();
                         Csv.WriteTick(measU, measI, phiUs, phiIs, thdUs, thdIs, statUs, statIs);
-                    }
+
+                    // SQLite operational log captures every tick, regardless of CSV setting
+                    try { OpLog.LogMeasurement(measU, measI, thdUs, thdIs, phiUs, phiIs, statUs, statIs); }
+                    catch { /* tolerate transient db errors */ }
                 });
             }
             catch (OperationCanceledException) { return; }
