@@ -49,8 +49,9 @@ public sealed class MainViewModel : ObservableObject
         Ripple    = new RippleViewModel   (() => _client, () => IsConnected);
         Sequence  = new SequenceViewModel (() => _client, () => IsConnected, this);
         Database  = new DatabaseViewModel (this);
+        Setter    = new ParameterSetterViewModel(() => _client, () => IsConnected);
 
-        SelectedView = SourceView; // default landing
+        SelectedView = SetterViewKey; // unified setter is the new default landing
 
         // Kick off the auto-detect on launch via the UI dispatcher so all property
         // updates land on the UI thread (the actual serial probe still yields via async).
@@ -65,10 +66,11 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    public HarmonicsViewModel Harmonics { get; }
-    public RippleViewModel    Ripple { get; }
-    public SequenceViewModel  Sequence { get; }
-    public DatabaseViewModel  Database { get; }
+    public HarmonicsViewModel       Harmonics { get; }
+    public RippleViewModel          Ripple { get; }
+    public SequenceViewModel        Sequence { get; }
+    public DatabaseViewModel        Database { get; }
+    public ParameterSetterViewModel Setter { get; }
 
     // ---- Connection state ----
     public ObservableCollection<string> AvailablePorts { get; }
@@ -110,6 +112,7 @@ public sealed class MainViewModel : ObservableObject
                 Harmonics.RaiseCanExecute();
                 Ripple.RaiseCanExecute();
                 Sequence.RaiseCanExecute();
+                Setter.RaiseCanExecute();
             }
         }
     }
@@ -197,11 +200,12 @@ public sealed class MainViewModel : ObservableObject
     }
 
     // ---- Navigation ----
-    public string SourceView    => "source";
-    public string HarmonicsView => "harmonics";
-    public string RippleView    => "ripple";
-    public string SequenceView  => "sequence";
-    public string DatabaseView  => "database";
+    public string SetterViewKey   => "setter";
+    public string SourceView      => "source";
+    public string HarmonicsView   => "harmonics";
+    public string RippleView      => "ripple";
+    public string SequenceView    => "sequence";
+    public string DatabaseView    => "database";
 
     private string _selectedView = "source";
     public string SelectedView { get => _selectedView; set => Set(ref _selectedView, value); }

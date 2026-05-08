@@ -44,6 +44,14 @@
             <Border Grid.Column="0" Background="{StaticResource BgPanel}"
                     BorderBrush="{StaticResource BorderBrush1}" BorderThickness="0,0,1,0">
                 <StackPanel Orientation="Vertical" Margin="0,8">
+                    <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip" IsChecked="True"
+                                 ToolTip="Unified parameter setter — pick category + parameter, set anything"
+                                 Click="Icon_Setter_Click">
+                        <StackPanel>
+                            <TextBlock Text="⚙" FontSize="22" HorizontalAlignment="Center" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="Setter" FontSize="10" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
                                  IsEnabled="False" ToolTip="kWh meter test (needs PCS comms)">
                         <StackPanel>
@@ -71,8 +79,8 @@
                                  ToolTip="Sequence runner" Click="Icon_Sequence_Click">
                         <TextBlock Text="→" FontSize="20" HorizontalAlignment="Center"/>
                     </RadioButton>
-                    <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip" IsChecked="True"
-                                 ToolTip="PPS source control" Click="Icon_Source_Click">
+                    <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
+                                 ToolTip="Quick-fill source control (legacy 3-phase matrix)" Click="Icon_Source_Click">
                         <TextBlock Text="∿" FontSize="20" HorizontalAlignment="Center"/>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
@@ -87,6 +95,11 @@
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedView}" Value="setter">
+                                <Setter Property="Content">
+                                    <Setter.Value><views:ParameterSetterView/></Setter.Value>
+                                </Setter>
+                            </DataTrigger>
                             <DataTrigger Binding="{Binding SelectedView}" Value="source">
                                 <Setter Property="Content">
                                     <Setter.Value><views:SourceControlView/></Setter.Value>
