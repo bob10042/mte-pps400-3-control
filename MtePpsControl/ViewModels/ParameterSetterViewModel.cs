@@ -120,6 +120,10 @@ public sealed class ParameterSetterViewModel : ObservableObject
     public IReadOnlyList<int> AvailablePhases { get; } = new[] { 1, 2, 3 };
     public string? ParameterNotes => SelectedParameter?.Notes;
 
+    /// <summary>When true, Apply broadcasts the parameter to all three phases (1, 2, 3).</summary>
+    private bool _applyToAllPhases;
+    public bool ApplyToAllPhases { get => _applyToAllPhases; set => Set(ref _applyToAllPhases, value); }
+
     public AsyncRelayCommand ApplyCommand { get; }
     public RelayCommand ClearLogCommand { get; }
 
@@ -132,25 +136,30 @@ public sealed class ParameterSetterViewModel : ObservableObject
         if (client is null || def is null) return;
 
         var values = ExtraInputs.Select(e => e.Value).ToList();
-        var phase  = def.PerPhase ? (int?)SelectedPhase : null;
-        var line   = def.Format(phase, values);
+        // Determine which phase(s) to apply to
+        var phasesToApply = !def.PerPhase           ? new int?[] { null }
+                          : ApplyToAllPhases        ? new int?[] { 1, 2, 3 }
+                                                    : new int?[] { SelectedPhase };
 
-        try
+        foreach (var phase in phasesToApply)
         {
-            var replies = await client.SendAsync(line);
-            var received = string.Join(" | ", replies.Select(r => r.Raw));
-            var status = replies.Any(r => r.IsOk)      ? "OK"
-                       : replies.Any(r => r.IsError)   ? "E"
-                       : replies.Any(r => r.IsUnknown) ? "?"
-                       : replies.Count == 0            ? "—"
-                                                       : "ok";
-            Log.Insert(0, new CommandLogEntry { Sent = line, Received = received, Status = status });
-            // Keep the log to a reasonable size
-            while (Log.Count > 100) Log.RemoveAt(Log.Count - 1);
-        }
-        catch (Exception ex)
-        {
-            Log.Insert(0, new CommandLogEntry { Sent = line, Received = $"<exception> {ex.Message}", Status = "ERR" });
+            var line = def.Format(phase, values);
+            try
+            {
+                var replies = await client.SendAsync(line);
+                var received = string.Join(" | ", replies.Select(r => r.Raw));
+                var status = replies.Any(r => r.IsOk)      ? "OK"
+                           : replies.Any(r => r.IsError)   ? "E"
+                           : replies.Any(r => r.IsUnknown) ? "?"
+                           : replies.Count == 0            ? "—"
+                                                           : "ok";
+                Log.Insert(0, new CommandLogEntry { Sent = line, Received = received, Status = status });
+                while (Log.Count > 100) Log.RemoveAt(Log.Count - 1);
+            }
+            catch (Exception ex)
+            {
+                Log.Insert(0, new CommandLogEntry { Sent = line, Received = $"<exception> {ex.Message}", Status = "ERR" });
+            }
         }
     }
 }

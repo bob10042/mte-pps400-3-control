@@ -4,16 +4,18 @@
 
     <!-- Value converters used across views -->
     <conv:BoolToVisibilityConverter   x:Key="BoolToVis"/>
+    <conv:BoolNotConverter            x:Key="BoolNot"/>
     <conv:IntEqualsCheckConverter     x:Key="IntEqualsCheck"/>
     <conv:StringToVisibilityConverter x:Key="StrToVis"/>
     <conv:StatusToColorConverter      x:Key="StatusToColor"/>
 
     <!-- Light "instrument panel" theme — silver/grey background like the PCS400.3 touchscreen,
-         with bright MTE-blue accents and per-phase colour stripes. -->
-    <Color x:Key="BgDeepColor">#FFE3E7ED</Color>     <!-- main body, soft silver -->
+         with bright MTE-blue accents and per-phase colour stripes.
+         Stronger contrast: card panels float on a noticeably darker silver base. -->
+    <Color x:Key="BgDeepColor">#FFB7C2D2</Color>     <!-- darker silver body for contrast -->
     <Color x:Key="BgPanelColor">#FFFFFFFF</Color>    <!-- white card panels -->
-    <Color x:Key="BgRaisedColor">#FFF3F6FA</Color>   <!-- inputs / raised surfaces -->
-    <Color x:Key="BorderColor">#FFB6C2D2</Color>     <!-- card borders -->
+    <Color x:Key="BgRaisedColor">#FFEEF3FA</Color>   <!-- inputs / raised surfaces -->
+    <Color x:Key="BorderColor">#FF7C8FA8</Color>     <!-- visible card borders -->
 
     <Color x:Key="AccentColor">#FF0E7CCB</Color>     <!-- MTE blue -->
     <Color x:Key="AccentDarkColor">#FF0A5E9B</Color>

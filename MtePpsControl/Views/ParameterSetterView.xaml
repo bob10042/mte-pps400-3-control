@@ -3,18 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             DataContext="{Binding Setter, RelativeSource={RelativeSource AncestorType=Window}}">
+             mc:Ignorable="d">
     <DockPanel Margin="20" LastChildFill="True">
 
-        <!-- Header -->
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
             <TextBlock Text="Parameter Setter" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource Accent}"/>
-            <TextBlock Text="Pick a category and parameter, fill in the values, hit Apply. Drives every command in the spec."
+            <TextBlock Text="Pick a category on the left, parameter in the middle, set values, hit Apply."
                        Foreground="{StaticResource TextDim}" FontSize="12"/>
         </StackPanel>
 
-        <!-- Action row docked bottom (always visible) -->
         <Border DockPanel.Dock="Bottom" Margin="0,12,0,0" Background="{StaticResource BgPanel}"
                 BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="14,10">
             <Grid>
@@ -22,60 +19,136 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Tip: " Foreground="{StaticResource TextDim}" FontStyle="Italic"/>
-                    <TextBlock Foreground="{StaticResource TextDim}" FontStyle="Italic"
-                               Text="setpoints queue until you Apply 'SET (apply queued setpoints)' from the Actions category."/>
-                </StackPanel>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontStyle="Italic" Foreground="{StaticResource TextDim}"
+                           Text="Tip: setpoints queue until you Apply &quot;SET&quot; from the Actions category."/>
                 <Button Grid.Column="1" Content="Apply parameter" Style="{StaticResource PrimaryButton}"
-                        Command="{Binding ApplyCommand}" MinWidth="160" FontSize="14"/>
+                        Command="{Binding Setter.ApplyCommand}" MinWidth="160" FontSize="14"/>
             </Grid>
         </Border>
 
-        <!-- Middle: cascade form + log -->
         <Grid>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="320"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*" MinWidth="380"/>
+                <ColumnDefinition Width="320"/>
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT: cascade form -->
             <Border Grid.Column="0" Margin="0,0,8,0" Background="{StaticResource BgPanel}"
+                    BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Category" Padding="12,10"
+                               Foreground="{StaticResource Accent}" FontWeight="SemiBold"
+                               Background="{StaticResource AccentSoft}"/>
+                    <ListBox ItemsSource="{Binding Setter.Categories}" SelectedItem="{Binding Setter.SelectedCategory}"
+                             BorderThickness="0" Background="Transparent" Padding="4">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="10,8"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Foreground" Value="{StaticResource Text}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="brd" Background="Transparent" Padding="{TemplateBinding Padding}" CornerRadius="3">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="brd" Property="Background" Value="{StaticResource AccentSoft}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="brd" Property="Background" Value="{StaticResource Accent}"/>
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="1" Margin="4,0,4,0" Background="{StaticResource BgPanel}"
+                    BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Parameter" Padding="12,10"
+                               Foreground="{StaticResource Accent}" FontWeight="SemiBold"
+                               Background="{StaticResource AccentSoft}"/>
+                    <ListBox ItemsSource="{Binding Setter.Parameters}" SelectedItem="{Binding Setter.SelectedParameter}"
+                             BorderThickness="0" Background="Transparent" Padding="4">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" Padding="2,1"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="10,6"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Foreground" Value="{StaticResource Text}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="brd" Background="Transparent" Padding="{TemplateBinding Padding}" CornerRadius="3">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="brd" Property="Background" Value="{StaticResource AccentSoft}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="brd" Property="Background" Value="{StaticResource Accent}"/>
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="2" Margin="4,0,4,0" Background="{StaticResource BgPanel}"
                     BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="16">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <!-- Category -->
-                        <TextBlock Text="Category" Foreground="{StaticResource TextDim}" Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"
-                                  Margin="0,0,0,12" FontSize="13"/>
-
-                        <!-- Parameter -->
-                        <TextBlock Text="Parameter" Foreground="{StaticResource TextDim}" Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding Parameters}" SelectedItem="{Binding SelectedParameter}"
-                                  Margin="0,0,0,12" FontSize="13"/>
-
-                        <!-- Phase (only when applicable) -->
-                        <StackPanel Visibility="{Binding NeedsPhase, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Phase" Foreground="{StaticResource TextDim}" Margin="0,0,0,4"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                <RadioButton Content="L1" Margin="0,0,12,0" IsChecked="{Binding SelectedPhase, ConverterParameter=1, Converter={StaticResource IntEqualsCheck}}"
-                                             GroupName="psPhase" Foreground="{StaticResource L1}" FontWeight="Bold"/>
-                                <RadioButton Content="L2" Margin="0,0,12,0" IsChecked="{Binding SelectedPhase, ConverterParameter=2, Converter={StaticResource IntEqualsCheck}}"
-                                             GroupName="psPhase" Foreground="{StaticResource L2}" FontWeight="Bold"/>
-                                <RadioButton Content="L3" Margin="0,0,12,0" IsChecked="{Binding SelectedPhase, ConverterParameter=3, Converter={StaticResource IntEqualsCheck}}"
-                                             GroupName="psPhase" Foreground="{StaticResource L3}" FontWeight="Bold"/>
+                        <StackPanel Visibility="{Binding Setter.NeedsPhase, Converter={StaticResource BoolToVis}}" Margin="0,0,0,16">
+                            <TextBlock Text="Apply to" Foreground="{StaticResource TextDim}" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="L1" Margin="0,0,12,0" FontWeight="Bold" Foreground="{StaticResource L1}"
+                                             IsChecked="{Binding Setter.SelectedPhase, ConverterParameter=1, Converter={StaticResource IntEqualsCheck}}"
+                                             IsEnabled="{Binding Setter.ApplyToAllPhases, Converter={StaticResource BoolNot}}"
+                                             GroupName="psPhase"/>
+                                <RadioButton Content="L2" Margin="0,0,12,0" FontWeight="Bold" Foreground="{StaticResource L2}"
+                                             IsChecked="{Binding Setter.SelectedPhase, ConverterParameter=2, Converter={StaticResource IntEqualsCheck}}"
+                                             IsEnabled="{Binding Setter.ApplyToAllPhases, Converter={StaticResource BoolNot}}"
+                                             GroupName="psPhase"/>
+                                <RadioButton Content="L3" Margin="0,0,12,0" FontWeight="Bold" Foreground="{StaticResource L3}"
+                                             IsChecked="{Binding Setter.SelectedPhase, ConverterParameter=3, Converter={StaticResource IntEqualsCheck}}"
+                                             IsEnabled="{Binding Setter.ApplyToAllPhases, Converter={StaticResource BoolNot}}"
+                                             GroupName="psPhase"/>
+                                <CheckBox Content="All 3 phases" Margin="20,0,0,0" FontWeight="SemiBold"
+                                          IsChecked="{Binding Setter.ApplyToAllPhases}"
+                                          ToolTip="Broadcasts to L1, L2, L3 in sequence on Apply."/>
                             </StackPanel>
                         </StackPanel>
 
-                        <!-- Extra inputs (dynamic per parameter) -->
-                        <ItemsControl ItemsSource="{Binding ExtraInputs}">
+                        <TextBlock Text="Values" Foreground="{StaticResource TextDim}" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                        <ItemsControl ItemsSource="{Binding Setter.ExtraInputs}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="120"/>
-                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="50"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center"
                                                    Foreground="{StaticResource Text}" FontSize="13"/>
@@ -87,20 +160,20 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <!-- Notes -->
-                        <Border Background="{StaticResource AccentSoft}" CornerRadius="3" Padding="8,6"
-                                Margin="0,4,0,0"
-                                Visibility="{Binding ParameterNotes, Converter={StaticResource StrToVis}}">
-                            <TextBlock Text="{Binding ParameterNotes}" TextWrapping="Wrap" FontSize="12"
-                                       Foreground="{StaticResource AccentDark}"/>
+                        <Border Background="#FFFFEEC0" CornerRadius="3" Padding="10,8" Margin="0,8,0,0"
+                                BorderBrush="#FFE6B85C" BorderThickness="1"
+                                Visibility="{Binding Setter.ParameterNotes, Converter={StaticResource StrToVis}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="ℹ" Foreground="#FFB36F00" FontSize="14" FontWeight="Bold" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding Setter.ParameterNotes}" TextWrapping="Wrap" FontSize="12" Foreground="#FF5C4500"/>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
 
-            <!-- RIGHT: command log -->
-            <Border Grid.Column="1" Margin="8,0,0,0" Background="{StaticResource BgPanel}"
-                    BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="0">
+            <Border Grid.Column="3" Margin="4,0,0,0" Background="{StaticResource BgPanel}"
+                    BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -113,9 +186,9 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Recent commands" FontWeight="SemiBold"/>
                         <Button Grid.Column="1" Content="Clear" Style="{StaticResource PanelButton}" MinWidth="60" Padding="8,3"
-                                Command="{Binding ClearLogCommand}"/>
+                                Command="{Binding Setter.ClearLogCommand}"/>
                     </Grid>
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Log}" Background="Transparent" BorderThickness="0"
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Setter.Log}" Background="Transparent" BorderThickness="0"
                              ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="6">
                         <ListBox.ItemTemplate>
                             <DataTemplate>

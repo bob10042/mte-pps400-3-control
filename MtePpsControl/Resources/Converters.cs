@@ -40,6 +40,15 @@ public sealed class StringToVisibilityConverter : IValueConverter
         => Binding.DoNothing;
 }
 
+/// <summary>Inverts a bool — useful for IsEnabled bindings driven by an inverse flag.</summary>
+public sealed class BoolNotConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b ? !b : true;
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is bool b ? !b : false;
+}
+
 /// <summary>Reply-status code (OK/E/?/ERR) ⇒ pill-background colour.</summary>
 public sealed class StatusToColorConverter : IValueConverter
 {
