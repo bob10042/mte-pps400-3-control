@@ -1,0 +1,287 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Light "instrument panel" theme — silver/grey background like the PCS400.3 touchscreen,
+         with bright MTE-blue accents and per-phase colour stripes. -->
+    <Color x:Key="BgDeepColor">#FFE3E7ED</Color>     <!-- main body, soft silver -->
+    <Color x:Key="BgPanelColor">#FFFFFFFF</Color>    <!-- white card panels -->
+    <Color x:Key="BgRaisedColor">#FFF3F6FA</Color>   <!-- inputs / raised surfaces -->
+    <Color x:Key="BorderColor">#FFB6C2D2</Color>     <!-- card borders -->
+
+    <Color x:Key="AccentColor">#FF0E7CCB</Color>     <!-- MTE blue -->
+    <Color x:Key="AccentDarkColor">#FF0A5E9B</Color>
+    <Color x:Key="AccentGlowColor">#FF40B0FF</Color>
+    <Color x:Key="AccentSoftColor">#FFD4E9FB</Color>
+
+    <Color x:Key="WarnColor">#FFFFA800</Color>
+    <Color x:Key="DangerColor">#FFE53935</Color>
+    <Color x:Key="OkColor">#FF2E8B57</Color>
+
+    <Color x:Key="TextColor">#FF111726</Color>
+    <Color x:Key="TextDimColor">#FF54637A</Color>
+
+    <!-- Per-phase accent palette -->
+    <Color x:Key="L1Color">#FFE53935</Color>
+    <Color x:Key="L2Color">#FFFFA800</Color>
+    <Color x:Key="L3Color">#FF0E7CCB</Color>
+
+    <SolidColorBrush x:Key="BgDeep"      Color="{StaticResource BgDeepColor}"/>
+    <SolidColorBrush x:Key="BgPanel"     Color="{StaticResource BgPanelColor}"/>
+    <SolidColorBrush x:Key="BgRaised"    Color="{StaticResource BgRaisedColor}"/>
+    <SolidColorBrush x:Key="BorderBrush1" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="Accent"      Color="{StaticResource AccentColor}"/>
+    <SolidColorBrush x:Key="AccentDark"  Color="{StaticResource AccentDarkColor}"/>
+    <SolidColorBrush x:Key="AccentGlow"  Color="{StaticResource AccentGlowColor}"/>
+    <SolidColorBrush x:Key="AccentSoft"  Color="{StaticResource AccentSoftColor}"/>
+    <SolidColorBrush x:Key="Warn"        Color="{StaticResource WarnColor}"/>
+    <SolidColorBrush x:Key="Danger"      Color="{StaticResource DangerColor}"/>
+    <SolidColorBrush x:Key="Ok"          Color="{StaticResource OkColor}"/>
+    <SolidColorBrush x:Key="Text"        Color="{StaticResource TextColor}"/>
+    <SolidColorBrush x:Key="TextDim"     Color="{StaticResource TextDimColor}"/>
+    <SolidColorBrush x:Key="L1"          Color="{StaticResource L1Color}"/>
+    <SolidColorBrush x:Key="L2"          Color="{StaticResource L2Color}"/>
+    <SolidColorBrush x:Key="L3"          Color="{StaticResource L3Color}"/>
+
+    <!-- Bright blue header strip — the "blue pane" along the top -->
+    <LinearGradientBrush x:Key="HeaderBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Offset="0"   Color="#FF0A5E9B"/>
+        <GradientStop Offset="0.5" Color="#FF0E7CCB"/>
+        <GradientStop Offset="1"   Color="#FF0A5E9B"/>
+    </LinearGradientBrush>
+
+    <Style TargetType="Window">
+        <Setter Property="Background" Value="{StaticResource BgDeep}"/>
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+    </Style>
+
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+    </Style>
+
+    <Style TargetType="Label">
+        <Setter Property="Foreground" Value="{StaticResource TextDim}"/>
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource BgRaised}"/>
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="6,4"/>
+        <Setter Property="MinWidth" Value="70"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource Accent}"/>
+                <Setter Property="Background" Value="#FFFFFFFF"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ComboBox">
+        <Setter Property="Background" Value="{StaticResource BgRaised}"/>
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+        <Setter Property="Padding" Value="6,3"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+    </Style>
+
+    <Style TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+    </Style>
+
+    <Style x:Key="PanelButton" TargetType="Button">
+        <Setter Property="Background" Value="#FFFFFFFF"/>
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="14,7"/>
+        <Setter Property="MinWidth" Value="92"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource Accent}"/>
+                <Setter Property="Background" Value="{StaticResource AccentSoft}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource PanelButton}">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#FF40B0FF"/>
+                    <GradientStop Offset="1" Color="#FF0E7CCB"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource AccentDark}"/>
+        <Setter Property="Foreground" Value="#FFFFFFFF"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Offset="0" Color="#FF7CD3FF"/>
+                            <GradientStop Offset="1" Color="#FF40B0FF"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PanelButton}">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#FFFF6B6B"/>
+                    <GradientStop Offset="1" Color="#FFC72020"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderBrush" Value="#FF8B0000"/>
+        <Setter Property="Foreground" Value="#FFFFFFFF"/>
+    </Style>
+
+    <Style x:Key="WarnButton" TargetType="Button" BasedOn="{StaticResource PanelButton}">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0" Color="#FFFFC233"/>
+                    <GradientStop Offset="1" Color="#FFD68800"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderBrush" Value="#FFB36F00"/>
+        <Setter Property="Foreground" Value="#FF1E1810"/>
+    </Style>
+
+    <!-- Icon-strip toggle: white card with red border when selected (matches the unit) -->
+    <Style x:Key="IconStripButton" TargetType="RadioButton">
+        <Setter Property="Background" Value="#FFFFFFFF"/>
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="Width" Value="74"/>
+        <Setter Property="Height" Value="74"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="brd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            Margin="3"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="brd" Property="BorderBrush" Value="{StaticResource Danger}"/>
+                            <Setter TargetName="brd" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="brd" Property="Background" Value="{StaticResource AccentSoft}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.30"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TopTab" TargetType="RadioButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#FFE6F2FF"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="22,6"/>
+        <Setter Property="Height" Value="46"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="brd"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0,0,0,3"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="brd" Property="BorderBrush" Value="#FFFFFFFF"/>
+                            <Setter Property="Foreground" Value="#FFFFFFFF"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFFFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="StatusChip" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BgPanel}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="Margin" Value="3,0"/>
+    </Style>
+
+    <Style x:Key="StatusDot" TargetType="Ellipse">
+        <Setter Property="Width" Value="11"/>
+        <Setter Property="Height" Value="11"/>
+        <Setter Property="Margin" Value="0,0,6,0"/>
+    </Style>
+
+    <Style TargetType="ListBox">
+        <Setter Property="Background" Value="#FFFFFFFF"/>
+        <Setter Property="Foreground" Value="{StaticResource Text}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+    </Style>
+
+    <!-- Reusable instrument-style icons (Path geometry) — clearer than emoji at 32px -->
+    <Geometry x:Key="IconSineWave">M 0,16 C 4,4 8,4 12,16 C 16,28 20,28 24,16 C 28,4 32,4 36,16</Geometry>
+    <Geometry x:Key="IconHarmonics">M 0,28 L 4,28 L 4,18 L 8,18 L 8,8 L 12,8 L 12,2 L 16,2 L 16,12 L 20,12 L 20,22 L 24,22 L 24,30</Geometry>
+    <Geometry x:Key="IconArrow">M 2,15 L 24,15 L 18,9 M 24,15 L 18,21</Geometry>
+    <Geometry x:Key="IconRipple">M 0,8 H 36  M 0,16 H 36  M 0,24 H 36</Geometry>
+    <Geometry x:Key="IconClamp">M 6,4 V 28 M 24,4 V 28 M 6,4 H 14 M 24,4 H 16 M 6,28 H 14 M 24,28 H 16</Geometry>
+    <Geometry x:Key="IconMeter">M 4,28 A 12,12 0 0 1 28,28 M 16,28 L 22,12</Geometry>
+
+</ResourceDictionary>

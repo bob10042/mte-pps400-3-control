@@ -1,0 +1,120 @@
+<UserControl x:Class="MtePpsControl.Views.HarmonicsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             DataContext="{Binding Harmonics, RelativeSource={RelativeSource AncestorType=Window}}">
+    <UserControl.Resources>
+        <Style TargetType="RadioButton" x:Key="ChipRadio">
+            <Setter Property="Background" Value="{StaticResource BgRaised}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush1}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,5"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDim}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="brd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="2"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="brd" Property="Background" Value="{StaticResource AccentSoft}"/>
+                                <Setter TargetName="brd" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                                <Setter Property="Foreground" Value="{StaticResource Text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Harmonics editor" FontSize="20" FontWeight="SemiBold"/>
+            <TextBlock Foreground="{StaticResource TextDim}" FontSize="12"
+                       Text="OWI / OWU — harmonics 2..15 added to fundamental. Amplitude in % of fundamental, phase in degrees."/>
+        </StackPanel>
+
+        <!-- Phase + V/I selector -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="Phase:" Margin="0,4,8,0" Foreground="{StaticResource TextDim}"/>
+            <RadioButton Content="L1" Style="{StaticResource ChipRadio}" GroupName="harmPhase"
+                         IsChecked="{Binding IsPhase1}" Command="{Binding SelectPhase1Command}"/>
+            <RadioButton Content="L2" Style="{StaticResource ChipRadio}" GroupName="harmPhase"
+                         IsChecked="{Binding IsPhase2}" Command="{Binding SelectPhase2Command}"/>
+            <RadioButton Content="L3" Style="{StaticResource ChipRadio}" GroupName="harmPhase"
+                         IsChecked="{Binding IsPhase3}" Command="{Binding SelectPhase3Command}"/>
+
+            <TextBlock Text="Side:" Margin="20,4,8,0" Foreground="{StaticResource TextDim}"/>
+            <RadioButton Content="Voltage (OWU)" Style="{StaticResource ChipRadio}" GroupName="harmSide"
+                         IsChecked="{Binding IsVoltage}" Command="{Binding SelectVoltageCommand}"/>
+            <RadioButton Content="Current (OWI)" Style="{StaticResource ChipRadio}" GroupName="harmSide"
+                         IsChecked="{Binding IsCurrent}" Command="{Binding SelectCurrentCommand}"/>
+        </StackPanel>
+
+        <!-- Harmonics table -->
+        <Border Grid.Row="2" Background="{StaticResource BgPanel}"
+                BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="3" Padding="0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Harmonics}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><StackPanel/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="12,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0" IsChecked="{Binding Enabled}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Label}" FontFamily="Consolas"
+                                           VerticalAlignment="Center" Foreground="{StaticResource Text}"/>
+                                <TextBlock Grid.Column="2" Text="Amplitude" Margin="8,0" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextDim}" HorizontalAlignment="Right"/>
+                                <TextBox Grid.Column="3" Width="80"
+                                         Text="{Binding AmplitudePercent, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"
+                                         IsEnabled="{Binding Enabled}"/>
+                                <TextBlock Grid.Column="4" Text="Phase" Margin="16,0,8,0" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextDim}" HorizontalAlignment="Right"/>
+                                <TextBox Grid.Column="5" Width="80"
+                                         Text="{Binding PhaseDegrees, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                                         IsEnabled="{Binding Enabled}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Actions -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <TextBlock Text="Note: SET on Source-Control to apply" VerticalAlignment="Center"
+                       Foreground="{StaticResource TextDim}" Margin="0,0,16,0" FontStyle="Italic"/>
+            <Button Content="Clear Phase" Style="{StaticResource WarnButton}" Command="{Binding ClearCommand}" Margin="0,0,8,0"/>
+            <Button Content="Push to PPS" Style="{StaticResource PrimaryButton}" Command="{Binding PushCommand}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

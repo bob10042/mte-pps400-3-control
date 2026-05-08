@@ -1,0 +1,235 @@
+<UserControl x:Class="MtePpsControl.Views.SourceControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <DockPanel Margin="20" LastChildFill="True">
+
+        <!-- Header strip: title + connection -->
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="PPS 400.3 — Source Control" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource Accent}"/>
+                <TextBlock Text="{Binding VersionLine}" Foreground="{StaticResource TextDim}" FontSize="12"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="{Binding AutoDetectStatus}" Foreground="{StaticResource TextDim}" VerticalAlignment="Center"
+                           Margin="0,0,8,0" FontSize="11" FontStyle="Italic"/>
+                <Button Content="🔍 Auto-detect" Style="{StaticResource PanelButton}"
+                        Command="{Binding AutoDetectCommand}" Margin="0,0,8,0" MinWidth="120"/>
+                <ComboBox ItemsSource="{Binding AvailablePorts}" SelectedItem="{Binding SelectedPort}" Width="100" Margin="0,0,8,0"/>
+                <Button Content="↻" Style="{StaticResource PanelButton}" MinWidth="30" Padding="6,2" Margin="0,0,8,0" Command="{Binding RefreshPortsCommand}"/>
+                <Button Content="Connect"    Style="{StaticResource PrimaryButton}" Command="{Binding ConnectCommand}"    Margin="0,0,4,0"/>
+                <Button Content="Disconnect" Style="{StaticResource PanelButton}"   Command="{Binding DisconnectCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- OUTPUT ON/OFF banner — docked top -->
+        <Border DockPanel.Dock="Top" Margin="0,0,0,12" CornerRadius="6" Padding="14,10">
+            <Border.Background>
+                <SolidColorBrush Color="{Binding OutputOnColor, FallbackValue=#FF2E8B57}"/>
+            </Border.Background>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="16" Height="16" Stroke="White" StrokeThickness="2" Margin="0,0,12,0">
+                        <Ellipse.Fill><SolidColorBrush Color="{Binding OutputOnColor, FallbackValue=#FF2E8B57}"/></Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock Text="{Binding OutputOnLabel}" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="BSY:" Foreground="#CCFFFFFF" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding IsBusy}" FontFamily="Consolas" Foreground="White" FontWeight="SemiBold" Margin="0,0,16,0"/>
+                    <TextBlock Text="SE:" Foreground="#CCFFFFFF" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding SeFlags}" FontFamily="Consolas" Foreground="White" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Action row — docked BOTTOM so it's always visible -->
+        <Border DockPanel.Dock="Bottom" Margin="0,12,0,0" Background="{StaticResource BgPanel}"
+                BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="14,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontStyle="Italic" Foreground="{StaticResource TextDim}"
+                           Text="Edit setpoints above, then SET to apply. OFF = ramped shut-off. EMERGENCY = immediate kill."/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="{Binding SetButtonLabel}" Style="{StaticResource PrimaryButton}" Command="{Binding ApplyCommand}" Margin="0,0,8,0" MinWidth="110" FontSize="14"/>
+                    <Button Content="OFF"        Style="{StaticResource WarnButton}"   Command="{Binding OffCommand}"       Margin="0,0,8,0" MinWidth="100" FontSize="14"/>
+                    <Button Content="EMERGENCY"  Style="{StaticResource DangerButton}" Command="{Binding EmergencyCommand}" MinWidth="140"  FontSize="14"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Scrollable middle: phase grid + global params + live measurements -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Per-phase setpoint matrix -->
+                <Border Background="{StaticResource BgPanel}"
+                        BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" MinWidth="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Grid.Column="1" Height="4" Margin="3,0" Background="{StaticResource L1}"/>
+                        <Border Grid.Row="0" Grid.Column="2" Height="4" Margin="3,0" Background="{StaticResource L2}"/>
+                        <Border Grid.Row="0" Grid.Column="3" Height="4" Margin="3,0" Background="{StaticResource L3}"/>
+
+                        <Grid Grid.Row="1" Grid.Column="1" Margin="3,4,3,8">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Ellipse Style="{StaticResource StatusDot}"><Ellipse.Fill><SolidColorBrush Color="{Binding Phases[0].StatusUColor, FallbackValue=#FF888888}"/></Ellipse.Fill></Ellipse>
+                                <TextBlock Text="L1" FontWeight="Bold" FontSize="14" Foreground="{StaticResource L1}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Phases[0].StatusULabel}" FontFamily="Consolas" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="2" Margin="3,4,3,8">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Ellipse Style="{StaticResource StatusDot}"><Ellipse.Fill><SolidColorBrush Color="{Binding Phases[1].StatusUColor, FallbackValue=#FF888888}"/></Ellipse.Fill></Ellipse>
+                                <TextBlock Text="L2" FontWeight="Bold" FontSize="14" Foreground="{StaticResource L2}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Phases[1].StatusULabel}" FontFamily="Consolas" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="3" Margin="3,4,3,8">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Ellipse Style="{StaticResource StatusDot}"><Ellipse.Fill><SolidColorBrush Color="{Binding Phases[2].StatusUColor, FallbackValue=#FF888888}"/></Ellipse.Fill></Ellipse>
+                                <TextBlock Text="L3" FontWeight="Bold" FontSize="14" Foreground="{StaticResource L3}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Phases[2].StatusULabel}" FontFamily="Consolas" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="U  (V)" Margin="0,4,16,4" Foreground="{StaticResource TextDim}"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Margin="3,2" Text="{Binding Phases[0].VoltageSet, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" Margin="3,2" Text="{Binding Phases[1].VoltageSet, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+                        <TextBox Grid.Row="2" Grid.Column="3" Margin="3,2" Text="{Binding Phases[2].VoltageSet, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="I  (A)" Margin="0,4,16,4" Foreground="{StaticResource TextDim}"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" Margin="3,2" Text="{Binding Phases[0].CurrentSet, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" Margin="3,2" Text="{Binding Phases[1].CurrentSet, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"/>
+                        <TextBox Grid.Row="3" Grid.Column="3" Margin="3,2" Text="{Binding Phases[2].CurrentSet, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="PH (°)" Margin="0,4,16,4" Foreground="{StaticResource TextDim}"/>
+                        <TextBox Grid.Row="4" Grid.Column="1" Margin="3,2" Text="{Binding Phases[0].VoltagePhaseAngle, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                        <TextBox Grid.Row="4" Grid.Column="2" Margin="3,2" Text="{Binding Phases[1].VoltagePhaseAngle, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                        <TextBox Grid.Row="4" Grid.Column="3" Margin="3,2" Text="{Binding Phases[2].VoltagePhaseAngle, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="φ  (°)" Margin="0,4,16,4" Foreground="{StaticResource TextDim}" ToolTip="Phase angle between U and I"/>
+                        <TextBox Grid.Row="5" Grid.Column="1" Margin="3,2" Text="{Binding Phases[0].Phi, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                        <TextBox Grid.Row="5" Grid.Column="2" Margin="3,2" Text="{Binding Phases[1].Phi, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                        <TextBox Grid.Row="5" Grid.Column="3" Margin="3,2" Text="{Binding Phases[2].Phi, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="U range" Margin="0,4,16,4" Foreground="{StaticResource TextDim}" ToolTip="0 = auto / smallest possible"/>
+                        <TextBox Grid.Row="6" Grid.Column="1" Margin="3,2" Text="{Binding Phases[0].VoltageRange, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="6" Grid.Column="2" Margin="3,2" Text="{Binding Phases[1].VoltageRange, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="6" Grid.Column="3" Margin="3,2" Text="{Binding Phases[2].VoltageRange, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="I range" Margin="0,4,16,4" Foreground="{StaticResource TextDim}" ToolTip="0 = auto / smallest possible"/>
+                        <TextBox Grid.Row="7" Grid.Column="1" Margin="3,2" Text="{Binding Phases[0].CurrentRange, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="7" Grid.Column="2" Margin="3,2" Text="{Binding Phases[1].CurrentRange, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Grid.Row="7" Grid.Column="3" Margin="3,2" Text="{Binding Phases[2].CurrentRange, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Big I  conn." Margin="0,4,16,4" Foreground="{StaticResource TextDim}" ToolTip="SKLI"/>
+                        <CheckBox Grid.Row="8" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Phases[0].BigCurrentConnector}"/>
+                        <CheckBox Grid.Row="8" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Phases[1].BigCurrentConnector}"/>
+                        <CheckBox Grid.Row="8" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Phases[2].BigCurrentConnector}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Global params -->
+                <Border Margin="0,12,0,0" Background="{StaticResource BgPanel}"
+                        BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="16">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Frequency (Hz)" Margin="0,4,8,0" Foreground="{StaticResource TextDim}"/>
+                        <TextBox Width="80" Margin="0,0,24,0" Text="{Binding Frequency, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}"/>
+                        <TextBlock Text="U ramp (s)" Margin="0,4,8,0" Foreground="{StaticResource TextDim}"/>
+                        <TextBox Width="60" Margin="0,0,16,0" Text="{Binding VoltageRamp, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                        <TextBlock Text="I ramp (s)" Margin="0,4,8,0" Foreground="{StaticResource TextDim}"/>
+                        <TextBox Width="60" Text="{Binding CurrentRamp, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Live measurements -->
+                <Border Margin="0,12,0,0" Background="{StaticResource BgPanel}"
+                        BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="12,10">
+                    <StackPanel>
+                        <TextBlock Text="Live measurements" FontSize="11" Foreground="{StaticResource TextDim}" Margin="0,0,0,6"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="L1" HorizontalAlignment="Center" Foreground="{StaticResource L1}" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="L2" HorizontalAlignment="Center" Foreground="{StaticResource L2}" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="L3" HorizontalAlignment="Center" Foreground="{StaticResource L3}" FontWeight="Bold"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="U meas. (V)" Foreground="{StaticResource TextDim}" Margin="0,2"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[0].VoltageMeasured, StringFormat=F2}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[1].VoltageMeasured, StringFormat=F2}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[2].VoltageMeasured, StringFormat=F2}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="I meas. (A)" Foreground="{StaticResource TextDim}" Margin="0,2"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[0].CurrentMeasured, StringFormat=F3}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[1].CurrentMeasured, StringFormat=F3}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="3" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[2].CurrentMeasured, StringFormat=F3}"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="THD U (%)" Foreground="{StaticResource TextDim}" Margin="0,2"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[0].ThdU, StringFormat=F2}"/>
+                            <TextBlock Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[1].ThdU, StringFormat=F2}"/>
+                            <TextBlock Grid.Row="3" Grid.Column="3" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[2].ThdU, StringFormat=F2}"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="THD I (%)" Foreground="{StaticResource TextDim}" Margin="0,2"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[0].ThdI, StringFormat=F2}"/>
+                            <TextBlock Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[1].ThdI, StringFormat=F2}"/>
+                            <TextBlock Grid.Row="4" Grid.Column="3" HorizontalAlignment="Center" FontFamily="Consolas" Text="{Binding Phases[2].ThdI, StringFormat=F2}"/>
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="φ U / φ I (°)" Foreground="{StaticResource TextDim}" Margin="0,2"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center" FontFamily="Consolas">
+                                <Run Text="{Binding Phases[0].PhiU, StringFormat=F1}"/><Run Text=" / "/><Run Text="{Binding Phases[0].PhiI, StringFormat=F1}"/>
+                            </TextBlock>
+                            <TextBlock Grid.Row="5" Grid.Column="2" HorizontalAlignment="Center" FontFamily="Consolas">
+                                <Run Text="{Binding Phases[1].PhiU, StringFormat=F1}"/><Run Text=" / "/><Run Text="{Binding Phases[1].PhiI, StringFormat=F1}"/>
+                            </TextBlock>
+                            <TextBlock Grid.Row="5" Grid.Column="3" HorizontalAlignment="Center" FontFamily="Consolas">
+                                <Run Text="{Binding Phases[2].PhiU, StringFormat=F1}"/><Run Text=" / "/><Run Text="{Binding Phases[2].PhiI, StringFormat=F1}"/>
+                            </TextBlock>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

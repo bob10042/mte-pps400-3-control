@@ -1,0 +1,111 @@
+<UserControl x:Class="MtePpsControl.Views.SequenceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             DataContext="{Binding Sequence, RelativeSource={RelativeSource AncestorType=Window}}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Test sequence runner" FontSize="20" FontWeight="SemiBold"/>
+            <TextBlock Foreground="{StaticResource TextDim}" FontSize="12"
+                       Text="Capture the current source-control values as a step. Run walks each step: applies setpoints, holds for the duration, advances. Off-ramps when done."/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="{StaticResource BgPanel}"
+                BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="3">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="{StaticResource BgRaised}" Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="80"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="#"        Margin="12,8" Foreground="{StaticResource TextDim}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="1" Text="Name"     Margin="8,8" Foreground="{StaticResource TextDim}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="2" Text="Setpoints" Margin="8,8" Foreground="{StaticResource TextDim}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="3" Text="Hold (s)" Margin="8,8" Foreground="{StaticResource TextDim}" FontWeight="SemiBold"/>
+                </Grid>
+                <ListBox Grid.Row="1" ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}"
+                         Background="Transparent" BorderThickness="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Foreground" Value="{StaticResource Text}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="brd" Background="{TemplateBinding Background}" Padding="0">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="brd" Property="Background" Value="{StaticResource AccentSoft}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="80"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Margin="12,4" FontFamily="Consolas" VerticalAlignment="Center"
+                                           Text="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, StringFormat={}{0}}"/>
+                                <TextBox Grid.Column="1" Margin="8,2" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                                <TextBlock Grid.Column="2" Margin="8,4" FontFamily="Consolas" VerticalAlignment="Center" Text="{Binding Summary}"/>
+                                <TextBox Grid.Column="3" Margin="8,2" Text="{Binding HoldSeconds, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Margin="0,12,0,0" Background="{StaticResource BgPanel}"
+                BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="3" Padding="12,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Status:" Foreground="{StaticResource TextDim}" Margin="0,0,8,0"/>
+                <TextBlock Text="{Binding StatusLine}" FontFamily="Consolas"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Actions -->
+        <Grid Grid.Row="3" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="+ Capture from Source" Style="{StaticResource PanelButton}" Command="{Binding CaptureCommand}" Margin="0,0,4,0"/>
+                <Button Content="↑ Up"     Style="{StaticResource PanelButton}" Command="{Binding MoveUpCommand}"   Margin="0,0,4,0"/>
+                <Button Content="↓ Down"   Style="{StaticResource PanelButton}" Command="{Binding MoveDownCommand}" Margin="0,0,4,0"/>
+                <Button Content="− Remove" Style="{StaticResource PanelButton}" Command="{Binding RemoveCommand}"   Margin="0,0,4,0"/>
+                <Button Content="Clear all" Style="{StaticResource PanelButton}" Command="{Binding ClearCommand}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Stop"  Style="{StaticResource WarnButton}"    Command="{Binding StopCommand}" Margin="0,0,8,0"/>
+                <Button Content="▶ Run" Style="{StaticResource PrimaryButton}" Command="{Binding RunCommand}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

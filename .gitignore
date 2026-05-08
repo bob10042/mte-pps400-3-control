@@ -33,3 +33,16 @@ mte handbooks 2006/
 __pycache__/
 *.pyc
 .venv/
+
+# .NET / WPF build outputs
+**/bin/
+**/obj/
+*.user
+*.suo
+
+# Local app data + screenshots
+gui_*.png
+gui_screenshot.png
+
+# Claude worktree internals
+.claude/
