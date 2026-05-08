@@ -50,6 +50,8 @@ public sealed class MainViewModel : ObservableObject
         Sequence  = new SequenceViewModel (() => _client, () => IsConnected, this);
         Database  = new DatabaseViewModel (this);
         Setter    = new ParameterSetterViewModel(() => _client, () => IsConnected);
+        Csv       = new CsvLogger();
+        ToggleCsvLogCommand = new RelayCommand(ToggleCsv);
 
         SelectedView = SetterViewKey; // unified setter is the new default landing
 
@@ -71,6 +73,20 @@ public sealed class MainViewModel : ObservableObject
     public SequenceViewModel        Sequence { get; }
     public DatabaseViewModel        Database { get; }
     public ParameterSetterViewModel Setter { get; }
+    public CsvLogger                Csv { get; }
+    public RelayCommand             ToggleCsvLogCommand { get; }
+    public bool   IsCsvLogging => Csv.IsLogging;
+    public string CsvLogStatus => Csv.IsLogging
+        ? $"📝 logging → {System.IO.Path.GetFileName(Csv.CurrentFilePath)}"
+        : "log off";
+
+    private void ToggleCsv()
+    {
+        if (Csv.IsLogging) Csv.Stop();
+        else Csv.Start();
+        Raise(nameof(IsCsvLogging));
+        Raise(nameof(CsvLogStatus));
+    }
 
     // ---- Connection state ----
     public ObservableCollection<string> AvailablePorts { get; }
@@ -383,6 +399,18 @@ public sealed class MainViewModel : ObservableObject
                     }
                     SeFlags = $"E:{(se.Error?1:0)} W:{(se.Warning?1:0)} U:{(se.DosContactU?1:0)} I:{(se.DosContactI?1:0)} B:{(se.Busy?1:0)} P:{(se.PacketSteering?1:0)} R:{(se.RippleControl?1:0)}";
                     IsBusy = busy;
+
+                    // Write a CSV row if logging is on. Snapshot current per-phase state.
+                    if (Csv.IsLogging)
+                    {
+                        var thdUs = Phases.Select(p => p.ThdU).ToArray();
+                        var thdIs = Phases.Select(p => p.ThdI).ToArray();
+                        var phiUs = Phases.Select(p => p.PhiU).ToArray();
+                        var phiIs = Phases.Select(p => p.PhiI).ToArray();
+                        var statUs= Phases.Select(p => p.StatusU).ToArray();
+                        var statIs= Phases.Select(p => p.StatusI).ToArray();
+                        Csv.WriteTick(measU, measI, phiUs, phiIs, thdUs, thdIs, statUs, statIs);
+                    }
                 });
             }
             catch (OperationCanceledException) { return; }
