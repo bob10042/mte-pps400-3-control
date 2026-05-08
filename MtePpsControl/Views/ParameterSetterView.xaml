@@ -119,43 +119,54 @@
                     BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="16">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
+                        <!-- Phase checkboxes — multi-select. "All" / "None" buttons for quick selection. -->
                         <StackPanel Visibility="{Binding Setter.NeedsPhase, Converter={StaticResource BoolToVis}}" Margin="0,0,0,16">
-                            <TextBlock Text="Apply to" Foreground="{StaticResource TextDim}" Margin="0,0,0,6" FontWeight="SemiBold"/>
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton Content="L1" Margin="0,0,12,0" FontWeight="Bold" Foreground="{StaticResource L1}"
-                                             IsChecked="{Binding Setter.SelectedPhase, ConverterParameter=1, Converter={StaticResource IntEqualsCheck}}"
-                                             IsEnabled="{Binding Setter.ApplyToAllPhases, Converter={StaticResource BoolNot}}"
-                                             GroupName="psPhase"/>
-                                <RadioButton Content="L2" Margin="0,0,12,0" FontWeight="Bold" Foreground="{StaticResource L2}"
-                                             IsChecked="{Binding Setter.SelectedPhase, ConverterParameter=2, Converter={StaticResource IntEqualsCheck}}"
-                                             IsEnabled="{Binding Setter.ApplyToAllPhases, Converter={StaticResource BoolNot}}"
-                                             GroupName="psPhase"/>
-                                <RadioButton Content="L3" Margin="0,0,12,0" FontWeight="Bold" Foreground="{StaticResource L3}"
-                                             IsChecked="{Binding Setter.SelectedPhase, ConverterParameter=3, Converter={StaticResource IntEqualsCheck}}"
-                                             IsEnabled="{Binding Setter.ApplyToAllPhases, Converter={StaticResource BoolNot}}"
-                                             GroupName="psPhase"/>
-                                <CheckBox Content="All 3 phases" Margin="20,0,0,0" FontWeight="SemiBold"
-                                          IsChecked="{Binding Setter.ApplyToAllPhases}"
-                                          ToolTip="Broadcasts to L1, L2, L3 in sequence on Apply."/>
+                            <TextBlock Text="Apply to which phases" Foreground="{StaticResource TextDim}" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <CheckBox Content="L1" Margin="0,0,16,0" FontWeight="Bold" FontSize="14"
+                                          Foreground="{StaticResource L1}" IsChecked="{Binding Setter.Phase1}"/>
+                                <CheckBox Content="L2" Margin="0,0,16,0" FontWeight="Bold" FontSize="14"
+                                          Foreground="{StaticResource L2}" IsChecked="{Binding Setter.Phase2}"/>
+                                <CheckBox Content="L3" Margin="0,0,24,0" FontWeight="Bold" FontSize="14"
+                                          Foreground="{StaticResource L3}" IsChecked="{Binding Setter.Phase3}"/>
+                                <Button Content="All" Style="{StaticResource PanelButton}" MinWidth="60" Padding="8,3"
+                                        Command="{Binding Setter.SelectAllPhasesCommand}" Margin="0,0,4,0"/>
+                                <Button Content="None" Style="{StaticResource PanelButton}" MinWidth="60" Padding="8,3"
+                                        Command="{Binding Setter.SelectNoPhasesCommand}"/>
                             </StackPanel>
+                            <TextBlock Text="{Binding Setter.PhaseSummary}" FontStyle="Italic"
+                                       Foreground="{StaticResource Accent}" FontSize="12"/>
                         </StackPanel>
 
+                        <!-- Value inputs: vertical layout, label-on-top, full-width input, unit chip -->
                         <TextBlock Text="Values" Foreground="{StaticResource TextDim}" Margin="0,0,0,6" FontWeight="SemiBold"/>
                         <ItemsControl ItemsSource="{Binding Setter.ExtraInputs}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,0,0,10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="140"/>
-                                            <ColumnDefinition Width="50"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center"
-                                                   Foreground="{StaticResource Text}" FontSize="13"/>
-                                        <TextBox Grid.Column="1" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}" FontSize="13"/>
-                                        <TextBlock Grid.Column="2" Text="{Binding Unit}" VerticalAlignment="Center"
-                                                   Margin="6,0,0,0" Foreground="{StaticResource TextDim}"/>
-                                    </Grid>
+                                    <Border Background="#FFF7FBFF" BorderBrush="{StaticResource BorderBrush1}"
+                                            BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Label}" FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource Text}" Margin="0,0,0,4"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox Grid.Column="0" FontSize="16" Padding="8,6" MinHeight="36"
+                                                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"
+                                                         HorizontalContentAlignment="Right"/>
+                                                <Border Grid.Column="1" Background="{StaticResource AccentSoft}"
+                                                        BorderBrush="{StaticResource Accent}" BorderThickness="1"
+                                                        CornerRadius="3" Padding="10,6" Margin="6,0,0,0"
+                                                        VerticalAlignment="Stretch">
+                                                    <TextBlock Text="{Binding Unit}" FontWeight="SemiBold" FontSize="13"
+                                                               Foreground="{StaticResource AccentDark}"
+                                                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </Border>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -166,6 +177,19 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="ℹ" Foreground="#FFB36F00" FontSize="14" FontWeight="Bold" Margin="0,0,8,0"/>
                                 <TextBlock Text="{Binding Setter.ParameterNotes}" TextWrapping="Wrap" FontSize="12" Foreground="#FF5C4500"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- CSV recording controls -->
+                        <Border Background="#FFEFFAFF" BorderBrush="{StaticResource Accent}" BorderThickness="1"
+                                CornerRadius="4" Padding="10" Margin="0,16,0,0">
+                            <StackPanel>
+                                <TextBlock Text="CSV recording" FontWeight="SemiBold" FontSize="13"
+                                           Foreground="{StaticResource AccentDark}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding CsvLogStatus}" FontFamily="Consolas" FontSize="12"
+                                           Foreground="{StaticResource Text}" Margin="0,0,0,8"/>
+                                <Button Content="Start / Stop CSV recording" Style="{StaticResource PanelButton}"
+                                        Command="{Binding ToggleCsvLogCommand}" HorizontalAlignment="Left"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

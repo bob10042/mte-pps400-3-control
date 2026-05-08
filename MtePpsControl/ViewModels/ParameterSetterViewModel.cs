@@ -114,15 +114,32 @@ public sealed class ParameterSetterViewModel : ObservableObject
         return p.Category != ParameterCatalog.CatAction && p.Category != ParameterCatalog.CatReadback;
     }
 
-    private int _selectedPhase = 1;
-    public int SelectedPhase { get => _selectedPhase; set => Set(ref _selectedPhase, value); }
     public bool NeedsPhase => SelectedParameter?.PerPhase == true;
-    public IReadOnlyList<int> AvailablePhases { get; } = new[] { 1, 2, 3 };
     public string? ParameterNotes => SelectedParameter?.Notes;
 
-    /// <summary>When true, Apply broadcasts the parameter to all three phases (1, 2, 3).</summary>
-    private bool _applyToAllPhases;
-    public bool ApplyToAllPhases { get => _applyToAllPhases; set => Set(ref _applyToAllPhases, value); }
+    // Independent per-phase checkboxes — Apply iterates whichever are checked.
+    private bool _phase1 = true;
+    public bool Phase1 { get => _phase1; set { if (Set(ref _phase1, value)) Raise(nameof(PhaseSummary)); } }
+    private bool _phase2;
+    public bool Phase2 { get => _phase2; set { if (Set(ref _phase2, value)) Raise(nameof(PhaseSummary)); } }
+    private bool _phase3;
+    public bool Phase3 { get => _phase3; set { if (Set(ref _phase3, value)) Raise(nameof(PhaseSummary)); } }
+
+    public string PhaseSummary
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (Phase1) parts.Add("L1");
+            if (Phase2) parts.Add("L2");
+            if (Phase3) parts.Add("L3");
+            return parts.Count == 0 ? "No phase selected — pick at least one"
+                                    : "Will apply to: " + string.Join(" + ", parts);
+        }
+    }
+
+    public RelayCommand SelectAllPhasesCommand => new(() => { Phase1 = Phase2 = Phase3 = true; });
+    public RelayCommand SelectNoPhasesCommand  => new(() => { Phase1 = Phase2 = Phase3 = false; });
 
     public AsyncRelayCommand ApplyCommand { get; }
     public RelayCommand ClearLogCommand { get; }
@@ -137,9 +154,23 @@ public sealed class ParameterSetterViewModel : ObservableObject
 
         var values = ExtraInputs.Select(e => e.Value).ToList();
         // Determine which phase(s) to apply to
-        var phasesToApply = !def.PerPhase           ? new int?[] { null }
-                          : ApplyToAllPhases        ? new int?[] { 1, 2, 3 }
-                                                    : new int?[] { SelectedPhase };
+        IList<int?> phasesToApply;
+        if (!def.PerPhase) phasesToApply = new int?[] { null };
+        else
+        {
+            var picks = new List<int?>();
+            if (Phase1) picks.Add(1);
+            if (Phase2) picks.Add(2);
+            if (Phase3) picks.Add(3);
+            if (picks.Count == 0)
+            {
+                Log.Insert(0, new CommandLogEntry { Sent = def.Format(1, values),
+                                                    Received = "<no phase selected — pick L1/L2/L3>",
+                                                    Status = "ERR" });
+                return;
+            }
+            phasesToApply = picks;
+        }
 
         foreach (var phase in phasesToApply)
         {
