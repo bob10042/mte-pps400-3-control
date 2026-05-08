@@ -37,10 +37,18 @@ public sealed class PhaseSetpointViewModel : ObservableObject
     public double Phi { get => _phi; set => Set(ref _phi, value); }
 
     private double _voltageMeasured;
-    public double VoltageMeasured { get => _voltageMeasured; set => Set(ref _voltageMeasured, value); }
+    public double VoltageMeasured
+    {
+        get => _voltageMeasured;
+        set { if (Set(ref _voltageMeasured, value)) RaiseDerived(); }
+    }
 
     private double _currentMeasured;
-    public double CurrentMeasured { get => _currentMeasured; set => Set(ref _currentMeasured, value); }
+    public double CurrentMeasured
+    {
+        get => _currentMeasured;
+        set { if (Set(ref _currentMeasured, value)) RaiseDerived(); }
+    }
 
     private string _statusU = "—";
     public string StatusU
@@ -102,5 +110,23 @@ public sealed class PhaseSetpointViewModel : ObservableObject
     public double PhiU { get => _phiU; set => Set(ref _phiU, value); }
 
     private double _phiI;
-    public double PhiI { get => _phiI; set => Set(ref _phiI, value); }
+    public double PhiI
+    {
+        get => _phiI;
+        set { if (Set(ref _phiI, value)) RaiseDerived(); }
+    }
+
+    // ---- Derived per-phase power values (computed from measured U, I, φ) ----
+    public double ActivePower    => MtePpsControl.Protocol.PpsCalculations.ActivePower(_voltageMeasured, _currentMeasured, _phiI);
+    public double ReactivePower  => MtePpsControl.Protocol.PpsCalculations.ReactivePower(_voltageMeasured, _currentMeasured, _phiI);
+    public double ApparentPower  => MtePpsControl.Protocol.PpsCalculations.ApparentPower(_voltageMeasured, _currentMeasured);
+    public double PowerFactor    => MtePpsControl.Protocol.PpsCalculations.PowerFactor(_phiI);
+
+    private void RaiseDerived()
+    {
+        Raise(nameof(ActivePower));
+        Raise(nameof(ReactivePower));
+        Raise(nameof(ApparentPower));
+        Raise(nameof(PowerFactor));
+    }
 }
