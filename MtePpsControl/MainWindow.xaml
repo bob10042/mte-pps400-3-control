@@ -61,31 +61,59 @@
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
                                  IsEnabled="False" ToolTip="Analog meter test (needs PCS comms)">
-                        <TextBlock Text="A/V" FontSize="11" HorizontalAlignment="Center"/>
+                        <StackPanel>
+                            <TextBlock Text="A/V" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="meter" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource TextDim}"/>
+                        </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
                                  ToolTip="Harmonics editor (OWI/OWU)" Click="Icon_Harmonics_Click">
-                        <TextBlock Text="〰️" FontSize="20" HorizontalAlignment="Center"/>
+                        <StackPanel>
+                            <TextBlock Text="〰" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="Harm." FontSize="10" HorizontalAlignment="Center"/>
+                        </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
                                  IsEnabled="False" ToolTip="Wattmeter test (needs PCS comms)">
-                        <TextBlock Text="W" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <StackPanel>
+                            <TextBlock Text="W" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="watt" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource TextDim}"/>
+                        </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
                                  IsEnabled="False" ToolTip="Current transformer test (needs PCS comms)">
-                        <TextBlock Text="][" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <StackPanel>
+                            <TextBlock Text="][" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="CT" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource TextDim}"/>
+                        </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
-                                 ToolTip="Sequence runner" Click="Icon_Sequence_Click">
-                        <TextBlock Text="→" FontSize="20" HorizontalAlignment="Center"/>
+                                 ToolTip="Run a multi-step sequence (capture-from-source then walk steps)" Click="Icon_Sequence_Click">
+                        <StackPanel>
+                            <TextBlock Text="→" FontSize="22" HorizontalAlignment="Center" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="Seq." FontSize="10" HorizontalAlignment="Center"/>
+                        </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
-                                 ToolTip="Quick-fill source control (legacy 3-phase matrix)" Click="Icon_Source_Click">
-                        <TextBlock Text="∿" FontSize="20" HorizontalAlignment="Center"/>
+                                 ToolTip="Quick-fill source control (3-phase setpoint matrix)" Click="Icon_Source_Click">
+                        <StackPanel>
+                            <TextBlock Text="∿" FontSize="22" HorizontalAlignment="Center" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="Source" FontSize="10" HorizontalAlignment="Center"/>
+                        </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
-                                 ToolTip="Ripple control telegram" Click="Icon_Ripple_Click">
-                        <TextBlock Text="⫶⫶" FontSize="14" HorizontalAlignment="Center"/>
+                                 ToolTip="Ripple control telegram editor" Click="Icon_Ripple_Click">
+                        <StackPanel>
+                            <TextBlock Text="⫶⫶" FontSize="16" HorizontalAlignment="Center" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="Ripple" FontSize="10" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource IconStripButton}" GroupName="iconStrip"
+                                 ToolTip="Saved presets database" Click="Icon_Database_Click">
+                        <StackPanel>
+                            <TextBlock Text="🗄" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource Accent}"/>
+                            <TextBlock Text="DB" FontSize="10" HorizontalAlignment="Center"/>
+                        </StackPanel>
                     </RadioButton>
                 </StackPanel>
             </Border>

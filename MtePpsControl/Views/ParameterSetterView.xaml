@@ -119,6 +119,17 @@
                     BorderBrush="{StaticResource BorderBrush1}" BorderThickness="1" CornerRadius="6" Padding="16">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
+                        <!-- Big heading: what we're setting right now -->
+                        <Border Background="{StaticResource Accent}" CornerRadius="4" Padding="12,10" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="SETTING" FontSize="10" FontWeight="Bold" Foreground="#CCFFFFFF" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding Setter.SelectedParameter.Name, FallbackValue='— pick a parameter on the left —'}"
+                                           FontSize="20" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="{Binding Setter.SelectedCategory, StringFormat='in {0}'}"
+                                           FontSize="11" Foreground="#CCFFFFFF" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- Phase checkboxes — multi-select. "All" / "None" buttons for quick selection. -->
                         <StackPanel Visibility="{Binding Setter.NeedsPhase, Converter={StaticResource BoolToVis}}" Margin="0,0,0,16">
                             <TextBlock Text="Apply to which phases" Foreground="{StaticResource TextDim}" Margin="0,0,0,6" FontWeight="SemiBold"/>

@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private void Icon_Harmonics_Click(object sender, RoutedEventArgs e) => Vm.SelectedView = "harmonics";
     private void Icon_Ripple_Click(object sender, RoutedEventArgs e)    => Vm.SelectedView = "ripple";
     private void Icon_Sequence_Click(object sender, RoutedEventArgs e)  => Vm.SelectedView = "sequence";
+    private void Icon_Database_Click(object sender, RoutedEventArgs e)  => Vm.SelectedView = "database";
 
     private void TopTabReference_Click(object sender, RoutedEventArgs e) => Vm.SelectedView = "database";
     private void TopTabPps_Click(object sender, RoutedEventArgs e)       => Vm.SelectedView = "setter";
