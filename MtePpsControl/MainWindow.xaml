@@ -17,12 +17,12 @@
             <RowDefinition Height="34"/>
         </Grid.RowDefinitions>
 
-        <!-- Top tab bar -->
-        <Border Grid.Row="0" Background="{StaticResource BgPanel}" BorderBrush="{StaticResource BorderBrush1}"
-                BorderThickness="0,0,0,1">
-            <StackPanel Orientation="Horizontal" Margin="12,0">
-                <TextBlock Text="MTE  PCS 400.3" FontWeight="Bold" FontSize="14"
-                           VerticalAlignment="Center" Foreground="{StaticResource Accent}" Margin="0,0,30,0"/>
+        <!-- Top tab bar — bright blue header, the "blue pane" -->
+        <Border Grid.Row="0" Background="{StaticResource HeaderBrush}" BorderBrush="{StaticResource AccentDark}"
+                BorderThickness="0,0,0,2">
+            <StackPanel Orientation="Horizontal" Margin="16,0">
+                <TextBlock Text="MTE  PCS 400.3" FontWeight="Bold" FontSize="16"
+                           VerticalAlignment="Center" Foreground="White" Margin="0,0,30,0"/>
                 <RadioButton Content="Reference" Style="{StaticResource TopTab}" GroupName="topTabs"
                              Click="TopTabReference_Click"/>
                 <RadioButton Content="PPS400.3"  Style="{StaticResource TopTab}" GroupName="topTabs" IsChecked="True"
