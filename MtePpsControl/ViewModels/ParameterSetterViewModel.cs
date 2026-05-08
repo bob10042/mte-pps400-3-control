@@ -14,9 +14,38 @@ public sealed class ExtraInputRow : ObservableObject
     public ExtraInput Definition { get; }
     public string Label => Definition.Label;
     public string Unit  => Definition.Unit;
+    public bool IsInteger => Definition.IsInteger;
+    /// <summary>Format hint shown next to the input — e.g. "integer 0..15" or "decimal 0..600".</summary>
+    public string TypeHint
+    {
+        get
+        {
+            var t = Definition.IsInteger ? "integer" : "decimal";
+            string range = (Definition.Min, Definition.Max) switch
+            {
+                (double mn, double mx) => $" {mn:G}..{mx:G}",
+                (double mn, null)      => $" ≥{mn:G}",
+                (null, double mx)      => $" ≤{mx:G}",
+                _ => ""
+            };
+            return $"{t}{range}";
+        }
+    }
 
     private double _value;
-    public double Value { get => _value; set => Set(ref _value, value); }
+    public double Value
+    {
+        get => _value;
+        set
+        {
+            // Clamp to the spec range so we don't ever send out-of-range numbers.
+            if (Definition.Min is double mn && value < mn) value = mn;
+            if (Definition.Max is double mx && value > mx) value = mx;
+            // Snap to integer if this input is integer-typed
+            if (Definition.IsInteger) value = Math.Round(value);
+            Set(ref _value, value);
+        }
+    }
 }
 
 /// <summary>One entry in the "last commands" log shown under the setter.</summary>
@@ -86,6 +115,8 @@ public sealed class ParameterSetterViewModel : ObservableObject
         set
         {
             if (!Set(ref _selectedParameter, value)) return;
+            // Detach old PropertyChanged handlers
+            foreach (var old in ExtraInputs) old.PropertyChanged -= OnExtraInputChanged;
             // Rebuild the input form
             ExtraInputs.Clear();
             if (value != null)
@@ -93,11 +124,12 @@ public sealed class ParameterSetterViewModel : ObservableObject
                 if (value.ExtraInputs.Count == 0 && NeedsPrimaryValue(value))
                 {
                     // Synthesize a single primary input row
-                    ExtraInputs.Add(new ExtraInputRow(new ExtraInput(
+                    var inp = new ExtraInput(
                         Label: $"{value.Name}",
                         Unit: value.Unit,
                         Min: value.MinValue, Max: value.MaxValue,
-                        Default: 0)));
+                        Default: 0);
+                    ExtraInputs.Add(new ExtraInputRow(inp));
                 }
                 else
                 {
@@ -105,10 +137,18 @@ public sealed class ParameterSetterViewModel : ObservableObject
                         ExtraInputs.Add(new ExtraInputRow(inp));
                 }
             }
+            // Listen for value changes so the preview updates live
+            foreach (var row in ExtraInputs) row.PropertyChanged += OnExtraInputChanged;
             Raise(nameof(NeedsPhase));
             Raise(nameof(ParameterNotes));
+            Raise(nameof(PreviewLine));
             ApplyCommand.RaiseCanExecuteChanged();
         }
+    }
+
+    private void OnExtraInputChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ExtraInputRow.Value)) Raise(nameof(PreviewLine));
     }
 
     private static bool NeedsPrimaryValue(ParameterDefinition p)
@@ -120,13 +160,32 @@ public sealed class ParameterSetterViewModel : ObservableObject
     public bool NeedsPhase => SelectedParameter?.PerPhase == true;
     public string? ParameterNotes => SelectedParameter?.Notes;
 
+    /// <summary>Live preview of the exact RS-232 line(s) Apply would send right now.</summary>
+    public string PreviewLine
+    {
+        get
+        {
+            var def = SelectedParameter;
+            if (def is null) return "—";
+            var values = ExtraInputs.Select(e => e.Value).ToList();
+            if (!def.PerPhase) return def.Format(null, values);
+
+            var picks = new List<int>();
+            if (Phase1) picks.Add(1);
+            if (Phase2) picks.Add(2);
+            if (Phase3) picks.Add(3);
+            if (picks.Count == 0) return "(no phase selected)";
+            return string.Join("\n", picks.Select(p => def.Format(p, values)));
+        }
+    }
+
     // Independent per-phase checkboxes — Apply iterates whichever are checked.
     private bool _phase1 = true;
-    public bool Phase1 { get => _phase1; set { if (Set(ref _phase1, value)) Raise(nameof(PhaseSummary)); } }
+    public bool Phase1 { get => _phase1; set { if (Set(ref _phase1, value)) { Raise(nameof(PhaseSummary)); Raise(nameof(PreviewLine)); } } }
     private bool _phase2;
-    public bool Phase2 { get => _phase2; set { if (Set(ref _phase2, value)) Raise(nameof(PhaseSummary)); } }
+    public bool Phase2 { get => _phase2; set { if (Set(ref _phase2, value)) { Raise(nameof(PhaseSummary)); Raise(nameof(PreviewLine)); } } }
     private bool _phase3;
-    public bool Phase3 { get => _phase3; set { if (Set(ref _phase3, value)) Raise(nameof(PhaseSummary)); } }
+    public bool Phase3 { get => _phase3; set { if (Set(ref _phase3, value)) { Raise(nameof(PhaseSummary)); Raise(nameof(PreviewLine)); } } }
 
     public string PhaseSummary
     {

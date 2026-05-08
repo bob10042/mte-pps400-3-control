@@ -22,7 +22,7 @@ public sealed class ParameterDefinition
     public override string ToString() => Name;
 }
 
-public sealed record ExtraInput(string Label, string Unit = "", double? Min = null, double? Max = null, double Default = 0);
+public sealed record ExtraInput(string Label, string Unit = "", double? Min = null, double? Max = null, double Default = 0, bool IsInteger = false);
 
 /// <summary>Static catalogue covering every settable parameter on the PPS 400.3.</summary>
 public static class ParameterCatalog
@@ -106,7 +106,7 @@ public static class ParameterCatalog
             MinValue = 0, MaxValue = 40, Notes = "Index 2..6 max 40%, 7..31 max 10%. Sum ≤ 40%.",
             ExtraInputs = new[]
             {
-                new ExtraInput("Harmonic index", Min: 2, Max: 31, Default: 3),
+                new ExtraInput("Harmonic index", Min: 2, Max: 31, Default: 3, IsInteger: true),
                 new ExtraInput("Amplitude", "%", Min: 0, Max: 40, Default: 10),
                 new ExtraInput("Phase angle", "°", Min: -360, Max: 360, Default: 0),
             },
@@ -116,7 +116,7 @@ public static class ParameterCatalog
             Category = CatHarmonics, Name = "Current harmonic (OWI)", Unit = "%", PerPhase = true,
             ExtraInputs = new[]
             {
-                new ExtraInput("Harmonic index", Min: 2, Max: 31, Default: 3),
+                new ExtraInput("Harmonic index", Min: 2, Max: 31, Default: 3, IsInteger: true),
                 new ExtraInput("Amplitude", "%", Min: 0, Max: 40, Default: 10),
                 new ExtraInput("Phase angle", "°", Min: -360, Max: 360, Default: 0),
             },
@@ -193,7 +193,7 @@ public static class ParameterCatalog
             Category = CatSystem, Name = "Set parameter PAR<n>", PerPhase = false,
             ExtraInputs = new[]
             {
-                new ExtraInput("Parameter number", Min: 1, Max: 999, Default: 201),
+                new ExtraInput("Parameter number", Min: 1, Max: 999, Default: 201, IsInteger: true),
                 new ExtraInput("Value", Default: 0),
             },
             Notes = "1..99 = system params, 100..199 = all-DSP write, 200+ = per-DSP. Service-staff territory.",
@@ -201,13 +201,13 @@ public static class ParameterCatalog
         },
         new() {
             Category = CatSystem, Name = "Read parameter PAR<n>", PerPhase = false,
-            ExtraInputs = new[] { new ExtraInput("Parameter number", Min: 1, Max: 999, Default: 201) },
+            ExtraInputs = new[] { new ExtraInput("Parameter number", Min: 1, Max: 999, Default: 201, IsInteger: true) },
             Notes = "Reply contains the current value.",
             Format = (_, v) => $"PAR{(int)v[0]}",
         },
         new() {
             Category = CatSystem, Name = "Save parameters to flash (PAF)", PerPhase = false,
-            ExtraInputs = new[] { new ExtraInput("Mask", Min: 0, Max: 15, Default: 1) },
+            ExtraInputs = new[] { new ExtraInput("Mask", Min: 0, Max: 15, Default: 1, IsInteger: true) },
             Notes = "Mask = 1 (system) + 2 (DSP/range) + 4 (user mem) + 8 (load points). 0 = all.",
             Format = (_, v) => $"PAF{(int)v[0]}",
         },
@@ -225,8 +225,8 @@ public static class ParameterCatalog
             Category = CatSystem, Name = "Auto-result streaming (SP)", PerPhase = false,
             ExtraInputs = new[]
             {
-                new ExtraInput("Result number (0=all, 1=I, 2=U, 10=THDI, 11=THDU, 12=PhiI, 13=PhiU)", Min: 0, Max: 13, Default: 0),
-                new ExtraInput("Flag (0=disable, 1=enable, 2=enable-only-this)", Min: 0, Max: 2, Default: 1),
+                new ExtraInput("Result number (0=all, 1=I, 2=U, 10=THDI, 11=THDU, 12=PhiI, 13=PhiU)", Min: 0, Max: 13, Default: 0, IsInteger: true),
+                new ExtraInput("Flag (0=disable, 1=enable, 2=enable-only-this)", Min: 0, Max: 2, Default: 1, IsInteger: true),
             },
             Notes = "Steers which measurement results stream automatically. SP0,1 enables all; SP0,0 disables all.",
             Format = (_, v) => $"SP{(int)v[0]},{(int)v[1]}",

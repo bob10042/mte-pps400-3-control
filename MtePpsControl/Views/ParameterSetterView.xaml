@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:globalization="clr-namespace:System.Globalization;assembly=mscorlib"
              mc:Ignorable="d">
     <DockPanel Margin="20" LastChildFill="True">
 
@@ -157,16 +159,29 @@
                                     <Border Background="#FFF7FBFF" BorderBrush="{StaticResource BorderBrush1}"
                                             BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
                                         <StackPanel>
-                                            <TextBlock Text="{Binding Label}" FontSize="13" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource Text}" Margin="0,0,0,4"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource Text}" Margin="0,0,0,4"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding TypeHint}" FontSize="11"
+                                                           Foreground="{StaticResource TextDim}" FontFamily="Consolas"
+                                                           VerticalAlignment="Center"/>
+                                            </Grid>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBox Grid.Column="0" FontSize="16" Padding="8,6" MinHeight="36"
-                                                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, StringFormat=F3}"
-                                                         HorizontalContentAlignment="Right"/>
+                                                         HorizontalContentAlignment="Right">
+                                                    <TextBox.Text>
+                                                        <Binding Path="Value" UpdateSourceTrigger="PropertyChanged" StringFormat="F3"
+                                                                 ConverterCulture="{x:Static globalization:CultureInfo.InvariantCulture}"/>
+                                                    </TextBox.Text>
+                                                </TextBox>
                                                 <Border Grid.Column="1" Background="{StaticResource AccentSoft}"
                                                         BorderBrush="{StaticResource Accent}" BorderThickness="1"
                                                         CornerRadius="3" Padding="10,6" Margin="6,0,0,0"
@@ -181,6 +196,15 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <!-- Live preview of the exact RS-232 line(s) -->
+                        <Border Background="#FF1B2735" CornerRadius="4" Padding="12,10" Margin="0,4,0,0">
+                            <StackPanel>
+                                <TextBlock Text="WILL SEND" FontSize="10" FontWeight="Bold" Foreground="#FF7CD3FF" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding Setter.PreviewLine}" FontFamily="Consolas" FontSize="14"
+                                           Foreground="#FFEEF4FB" TextWrapping="NoWrap"/>
+                            </StackPanel>
+                        </Border>
 
                         <Border Background="#FFFFEEC0" CornerRadius="3" Padding="10,8" Margin="0,8,0,0"
                                 BorderBrush="#FFE6B85C" BorderThickness="1"
