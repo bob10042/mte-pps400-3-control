@@ -4,5 +4,9 @@ namespace MtePpsControl.Views;
 
 public partial class RippleView : UserControl
 {
-    public RippleView() => InitializeComponent();
+    public RippleView()
+    {
+        InitializeComponent();
+        this.AttachWhenLoaded(m => m.Ripple);
+    }
 }

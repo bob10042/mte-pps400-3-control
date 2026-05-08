@@ -4,5 +4,9 @@ namespace MtePpsControl.Views;
 
 public partial class DatabaseView : UserControl
 {
-    public DatabaseView() => InitializeComponent();
+    public DatabaseView()
+    {
+        InitializeComponent();
+        this.AttachWhenLoaded(m => m.Database);
+    }
 }

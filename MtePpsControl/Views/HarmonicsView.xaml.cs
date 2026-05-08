@@ -4,5 +4,9 @@ namespace MtePpsControl.Views;
 
 public partial class HarmonicsView : UserControl
 {
-    public HarmonicsView() => InitializeComponent();
+    public HarmonicsView()
+    {
+        InitializeComponent();
+        this.AttachWhenLoaded(m => m.Harmonics);
+    }
 }

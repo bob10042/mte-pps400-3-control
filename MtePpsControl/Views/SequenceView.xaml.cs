@@ -4,5 +4,9 @@ namespace MtePpsControl.Views;
 
 public partial class SequenceView : UserControl
 {
-    public SequenceView() => InitializeComponent();
+    public SequenceView()
+    {
+        InitializeComponent();
+        this.AttachWhenLoaded(m => m.Sequence);
+    }
 }
